@@ -36,23 +36,14 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-const titleHeight = 55.0;
-const contentHeight = 130.0;
-const widgetHeight1 = 100.0;
-const widgetHeight2 = 50.0;
-const widgetHeight3 = 55.0;
+double titleHeight = 55.sp;
+double contentHeight = 165.sp;
+double widgetHeight1 = 200.sp;
+double widgetHeight2 = 50.sp;
+double widgetHeight3 = 55.sp;
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  final _bloc = HomeBloc(
-    titleHeight: titleHeight,
-    contentHeight: contentHeight,
-    widgetHeight1: widgetHeight1,
-      widgetHeight2: widgetHeight2,
-      widgetHeight3: widgetHeight2,
-  widgetHeight4: widgetHeight3
-  );
-
-  void selectedTab(int index) {}
+  final _bloc = HomeBloc();
 
   @override
   void initState() {
@@ -92,6 +83,13 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
+      // _bloc.setWidgetHeight1 = widgetHeight1;
+      // _bloc.setWidgetHeight2 = widgetHeight2;
+      // _bloc.setWidgetHeight3 = widgetHeight2;
+      // _bloc.setWidgetHeight4 = widgetHeight3;
+      // _bloc.setTitleHeight = titleHeight;
+      // _bloc.setContentHeight = contentHeight;
+      _bloc.loadDataOffset(contentHeight,titleHeight, widgetHeight1,widgetHeight2,widgetHeight2,widgetHeight3,90.sp);
       return MaterialApp(
           debugShowCheckedModeBanner: true,
           title: 'Flutter Demo',

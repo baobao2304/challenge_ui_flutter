@@ -1,7 +1,5 @@
 import 'package:challengeui/content_model.dart';
-import 'package:challengeui/main.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 import 'mock_data.dart';
 
@@ -10,36 +8,17 @@ class HomeBloc with ChangeNotifier {
   List<CategoryItemModel> listItem = [];
   late TabController tabController;
   ScrollController scrollController = ScrollController();
-  double contentHeight, titleHeight;
-  double widgetHeight1, widgetHeight2, widgetHeight3, widgetHeight4;
-
-  HomeBloc(
-      {required this.contentHeight,
-      required this.titleHeight,
-      required this.widgetHeight1,
-      required this.widgetHeight2,
-      required this.widgetHeight3,
-      required this.widgetHeight4});
 
   void init(TickerProvider ticker) {
     tabController = TabController(vsync: ticker, length: homeCategories.length);
+    loadData();
+    scrollController.addListener(onScrollListener);
+  }
+
+  void loadData() {
     double offsetFrom = 0.0;
     double offsetTo = 0.0;
     for (int i = 0; i < homeCategories.length; i++) {
-      if (i == 0) {
-        offsetFrom = 0.0;
-        offsetTo = homeCategories[i].product.length * (contentHeight + 10) +
-            titleHeight +
-            widgetHeight1 +
-            widgetHeight2 +
-            widgetHeight3 +
-            widgetHeight4;
-      }
-      if (i > 0) {
-        offsetFrom = offsetTo;
-        offsetTo += homeCategories[i].product.length * (contentHeight + 10) +
-            titleHeight;
-      }
       print("$i  tab.offsetFrom $offsetFrom    tab.offsetTo $offsetTo");
       CategoryModel item = homeCategories[i];
       tabs.add(TitleTab(
@@ -53,7 +32,63 @@ class HomeBloc with ChangeNotifier {
         listItem.add(CategoryItemModel(productModel: product));
       }
     }
-    scrollController.addListener(onScrollListener);
+  }
+
+  // set setContentHeight(double newContentHeight) {
+  //   contentHeight = newContentHeight;
+  // }
+  //
+  // set setTitleHeight(double newTitleHeight) {
+  //   titleHeight = newTitleHeight;
+  // }
+  // set setWidgetHeight1(double newWidgetHeight1) {
+  //   widgetHeight1 = newWidgetHeight1;
+  // }
+  // set setWidgetHeight2(double newWidgetHeight2) {
+  //   widgetHeight2 = newWidgetHeight2;
+  // }
+  // set setWidgetHeight3(double newWidgetHeight3) {
+  //   widgetHeight3 = newWidgetHeight3;
+  // }
+  //
+  // set setWidgetHeight4(double newWidgetHeight4) {
+  //   widgetHeight4 = newWidgetHeight4;
+  // }
+
+  void loadDataOffset(
+      double contentHeight,
+      double titleHeight,
+      double widgetHeight1,
+      double widgetHeight2,
+      double widgetHeight3,
+      double widgetHeight4,
+      double height5) {
+    double offsetFrom = 0.0;
+    double offsetTo = 0.0;
+    for (int i = 0; i < homeCategories.length; i++) {
+      if (i == 0) {
+        offsetFrom = widgetHeight1 +
+            widgetHeight2 +
+            widgetHeight3 +
+            widgetHeight4 -
+            height5;
+        offsetTo = offsetFrom +
+            homeCategories[i].product.length * contentHeight +
+            titleHeight -20;
+      }
+      if (i > 0) {
+        offsetFrom = offsetTo;
+        offsetTo +=
+            homeCategories[i].product.length * contentHeight + titleHeight;
+      }
+      print(
+          "loadDataOffset  $i  tab.offsetFrom $offsetFrom    tab.offsetTo $offsetTo");
+      tabs[i].setOffsetFrom = offsetFrom;
+      tabs[i].setOffsetTo = offsetTo;
+
+    }
+    print(tabs);
+    print("dfsdf");
   }
 
   void onScrollListener() {
@@ -62,22 +97,26 @@ class HomeBloc with ChangeNotifier {
       scrollController.position.isScrollingNotifier.addListener(() {
         if (!scrollController.position.isScrollingNotifier.value) {
           print('scroll is stopped');
-          for (int i = 0; i < tabs.length; i++) {
-            final tab = tabs[i];
 
-            if (scrollController.offset >= tab.offsetFrom &&
-                scrollController.offset <= tab.offsetTo) {
-              print(
-                  "$i  tab.offsetFrom ${tab.offsetFrom}    tab.offsetTo ${tab.offsetTo}");
-              onCategorySelectedScroll(i);
-              tabController.animateTo(i);
-              break;
-            }
-          }
           if (scrollController.offset ==
               scrollController.position.maxScrollExtent) {
             onCategorySelectedScroll(tabs.length - 1);
             tabController.animateTo(tabs.length - 1);
+          }else if(scrollController.offset >= 0 &&scrollController.offset < tabs[0].offsetFrom){
+            tabController.animateTo(0);
+          }
+          else {
+            for (int i = 0; i < tabs.length; i++) {
+              final tab = tabs[i];
+
+              if (scrollController.offset >= tab.offsetFrom &&
+                  scrollController.offset < tab.offsetTo) {
+                // print("$i  tab.offsetFrom ${tab.offsetFrom}    tab.offsetTo ${tab.offsetTo}");
+                onCategorySelectedScroll(i);
+                tabController.animateTo(i);
+                break;
+              }
+            }
           }
         } else {
           print('scroll is started');
@@ -101,6 +140,7 @@ class HomeBloc with ChangeNotifier {
       element.setSelected = false;
     }
     tabs[index].setSelected = true;
+
     tabController.animateTo(index,
         duration: const Duration(milliseconds: 500), curve: Curves.linear);
     notifyListeners();
@@ -111,8 +151,10 @@ class HomeBloc with ChangeNotifier {
       element.setSelected = false;
     }
     tabs[index].setSelected = true;
+
     tabController.animateTo(index,
         duration: const Duration(milliseconds: 500), curve: Curves.linear);
+
     scrollController.animateTo(tabs[index].offsetFrom,
         duration: const Duration(milliseconds: 500), curve: Curves.linear);
     notifyListeners();
@@ -127,8 +169,8 @@ class TitleTab {
       required this.offsetTo});
 
   final CategoryModel categoryModel;
-  final double offsetFrom;
-  final double offsetTo;
+  double offsetFrom;
+  double offsetTo;
   bool selected;
 
   TitleTab copyWith(bool selected) => TitleTab(
@@ -139,5 +181,13 @@ class TitleTab {
 
   set setSelected(bool newSelected) {
     selected = newSelected;
+  }
+
+  set setOffsetFrom(double newOffsetFrom) {
+    offsetFrom = newOffsetFrom;
+  }
+
+  set setOffsetTo(double newOffsetTo) {
+    offsetTo = newOffsetTo;
   }
 }
