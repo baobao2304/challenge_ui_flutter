@@ -83,12 +83,6 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
-      // _bloc.setWidgetHeight1 = widgetHeight1;
-      // _bloc.setWidgetHeight2 = widgetHeight2;
-      // _bloc.setWidgetHeight3 = widgetHeight2;
-      // _bloc.setWidgetHeight4 = widgetHeight3;
-      // _bloc.setTitleHeight = titleHeight;
-      // _bloc.setContentHeight = contentHeight;
       _bloc.loadDataOffset(contentHeight,titleHeight, widgetHeight1,widgetHeight2,widgetHeight2,widgetHeight3,90.sp);
       return MaterialApp(
           debugShowCheckedModeBanner: true,

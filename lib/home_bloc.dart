@@ -34,27 +34,6 @@ class HomeBloc with ChangeNotifier {
     }
   }
 
-  // set setContentHeight(double newContentHeight) {
-  //   contentHeight = newContentHeight;
-  // }
-  //
-  // set setTitleHeight(double newTitleHeight) {
-  //   titleHeight = newTitleHeight;
-  // }
-  // set setWidgetHeight1(double newWidgetHeight1) {
-  //   widgetHeight1 = newWidgetHeight1;
-  // }
-  // set setWidgetHeight2(double newWidgetHeight2) {
-  //   widgetHeight2 = newWidgetHeight2;
-  // }
-  // set setWidgetHeight3(double newWidgetHeight3) {
-  //   widgetHeight3 = newWidgetHeight3;
-  // }
-  //
-  // set setWidgetHeight4(double newWidgetHeight4) {
-  //   widgetHeight4 = newWidgetHeight4;
-  // }
-
   void loadDataOffset(
       double contentHeight,
       double titleHeight,
