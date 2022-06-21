@@ -1,4 +1,13 @@
+import 'package:challengeui/component/location_infoview.dart';
+import 'package:challengeui/component/lunch_search.dart';
+import 'package:challengeui/content_model.dart';
+import 'package:challengeui/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+
+import 'component/content_item.dart';
+import 'component/custom_silver_appbar.dart';
+import 'component/title_item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,21 +16,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -31,75 +30,90 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderStateMixin{
-  late TabController _tabController;
+const titleHeight = 55.0;
+const contentHeight = 130.0;
+const widgetHeight1 = 100.0;
+const widgetHeight2 = 50.0;
+const widgetHeight3 = 55.0;
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  final _bloc = HomeBloc(
+    titleHeight: titleHeight,
+    contentHeight: contentHeight,
+    widgetHeight1: widgetHeight1,
+      widgetHeight2: widgetHeight2,
+      widgetHeight3: widgetHeight2,
+  widgetHeight4: widgetHeight3
+  );
 
-  List<Tab> tabs = <Tab>[
-    const Tab(text: 'Car',icon: Icon(Icons.car_rental)),
-    const Tab(text: 'Book',icon: Icon(Icons.book)),
-    const Tab(text: 'Computer',icon: Icon(Icons.laptop)),
-  ];
+  void selectedTab(int index) {}
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: tabs.length);
+    _bloc.init(this);
   }
 
-  // This widget is the root of your application.
+  String image =
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png";
+
+  Widget buildBodyList() => SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            if (index == 0) {
+              return Container(
+                height: 50.sp,
+              );
+            } else if (index == 1) {
+              return const LocationViewInfo();
+            } else if (index == 2) {
+              return const LunchSearch();
+            } else {
+              final item = _bloc.listItem[index - 3];
+              if (item.isCategory) {
+                return TitleItemWidget(
+                  categoryModel: item.categoryModel!,
+                );
+              } else {
+                return ContentItemWidget(productModel: item.productModel!);
+              }
+            }
+          },
+          childCount: _bloc.listItem.length + 3,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Scaffold(
-            appBar: AppBar(
-              title: const Text('Readerstacks Top Tab'),
-            ),
-
-            body:Column(
-
-              children: [ TabBar(
-                // labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                // automaticIndicatorColorAdjustment: true,
-                indicatorColor: Colors.red,
-                labelColor: Colors.red,
-                controller: _tabController,
-                tabs: tabs,
+    return Sizer(builder: (context, orientation, deviceType) {
+      return MaterialApp(
+          debugShowCheckedModeBanner: true,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: SafeArea(
+            child: Scaffold(
+              body: CustomScrollView(
+                controller: _bloc.scrollController,
+                slivers: [
+                  SliverPersistentHeader(
+                    floating: false,
+                    delegate: CustomSliverAppBarDelegate(
+                        expandedHeight: 200.sp, bloc: _bloc),
+                    pinned: true,
+                  ),
+                  buildBodyList()
+                ],
               ),
-                Expanded(child:TabBarView(
-
-                  controller: _tabController,
-                  children: tabs.map((Tab tab) {
-                    return Center(
-                      child: Text(
-                        '${tab.text!} Tab',
-                        style: Theme.of(context).textTheme.headline5,
-                      ),
-                    );
-                  }).toList(),
-                ))],
-            )
-        )
-    );
-
+            ),
+          ));
+    });
   }
 }
